@@ -38,7 +38,7 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	CachedDefaultWalkSpeed = CharacterMovement->MaxWalkSpeed;
 
 
-
+	// fill inventory with empty slots
 	for (int32 i = 0; i < 32; i++){
 		PlayerInventory.Add(FInventorySlotStruct());
 	}

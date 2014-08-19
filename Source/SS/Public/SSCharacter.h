@@ -86,6 +86,13 @@ struct FInventorySlotStruct{
 
 	TArray<ASSItem*> Items;
 
+	bool IsEmpty(){
+		return CurrentStackSize <= 0 && MaxStackSize <= 0;
+	}
+
+	bool IsFull(){
+		return CurrentStackSize == MaxStackSize;
+	}
 
 
 	FInventorySlotStruct(){
