@@ -1,5 +1,8 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
+
+#include "SSItem.h"
+
 #include "GameFramework/Character.h"
 #include "SSCharacter.generated.h"
 
@@ -68,6 +71,33 @@ struct FVitalsStruct {
 	}
 };
 
+USTRUCT()
+struct FInventorySlotStruct{
+
+	GENERATED_USTRUCT_BODY()
+
+	FString ItemName;
+
+	UTexture2D* ItemUIImage;
+
+	int32 MaxStackSize;
+
+	int32 CurrentStackSize;
+
+	TArray<ASSItem*> Items;
+
+
+
+	FInventorySlotStruct(){
+		ItemName = "NULL";
+		ItemUIImage = NULL;
+		MaxStackSize = -1;
+		CurrentStackSize = -1;
+		Items.Empty();
+	}
+
+};
+
 UCLASS(config=Game)
 class ASSCharacter : public ACharacter
 {
@@ -82,10 +112,13 @@ class ASSCharacter : public ACharacter
 	TSubobjectPtr<class UCameraComponent> FirstPersonCameraComponent;
 
 
-protected:
 
+
+		
 	///////////////////////////////////////////////////////
 	//  Player Vitals
+
+protected:
 
 	UPROPERTY(Replicated)
 	FVitalsStruct PlayerVitals;
@@ -93,7 +126,22 @@ protected:
 
 
 	//////////////////////////////////////////////////////
+	//  Player Inventory
+
+private:
+
+	UPROPERTY(Replicated)
+		TArray<FInventorySlotStruct> PlayerInventory;
+
+protected:
+
+
+
+
+	//////////////////////////////////////////////////////
 	//  Player Movement
+
+protected:
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
@@ -108,10 +156,11 @@ protected:
 	void SprintEnd();
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = Sprint)
-		float SprintMultiplier;
 
-	float DefaultWalkSpeed;
+	UPROPERTY(EditDefaultsOnly, Category = Sprint)
+	float SprintMultiplier;
+
+	float CachedDefaultWalkSpeed;
 
 
 
@@ -119,9 +168,18 @@ private:
 	//  Player Input Management
 
 protected:
-	// APawn interface
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-	// End of APawn interface
+
+
+	
+	///////////////////////////////////////////////////////
+	//  Accessor/Mutator
+
+public:
+
+	FVitalsStruct GetPlayerVitals();
+
 
 
 

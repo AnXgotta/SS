@@ -31,7 +31,17 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P are set in the
 	// derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
-	DefaultWalkSpeed = CharacterMovement->MaxWalkSpeed;
+
+
+
+
+	CachedDefaultWalkSpeed = CharacterMovement->MaxWalkSpeed;
+
+
+
+	for (int32 i = 0; i < 32; i++){
+		PlayerInventory.Add(FInventorySlotStruct());
+	}
 
 }
 
@@ -54,11 +64,11 @@ void ASSCharacter::MoveRight(float Value){
 }
 
 void ASSCharacter::SprintStart(){
-	CharacterMovement->MaxWalkSpeed = DefaultWalkSpeed * SprintMultiplier;
+	CharacterMovement->MaxWalkSpeed = CachedDefaultWalkSpeed * SprintMultiplier;
 }
 
 void ASSCharacter::SprintEnd(){
-	CharacterMovement->MaxWalkSpeed = DefaultWalkSpeed;
+	CharacterMovement->MaxWalkSpeed = CachedDefaultWalkSpeed;
 }
 
 
@@ -89,5 +99,13 @@ void ASSCharacter::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASSCharacter, PlayerVitals);
+	DOREPLIFETIME(ASSCharacter, PlayerInventory);
 
+}
+
+///////////////////////////////////////////////////////
+//  Accessor/Mutator
+
+FVitalsStruct ASSCharacter::GetPlayerVitals(){
+	return PlayerVitals;
 }

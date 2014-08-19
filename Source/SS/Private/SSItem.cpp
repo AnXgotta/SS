@@ -11,3 +11,13 @@ ASSItem::ASSItem(const class FPostConstructInitializeProperties& PCIP)
 }
 
 
+
+
+
+////////////////////////////////////////////////////
+//  Accessor/Mutator
+
+FPropertiesStruct ASSItem::GetItemProperties(){
+	return ItemProperties;
+}
+
