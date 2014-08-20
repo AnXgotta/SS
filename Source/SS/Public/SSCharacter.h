@@ -110,9 +110,10 @@ class ASSCharacter : public ACharacter
 {
 	GENERATED_UCLASS_BODY()
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
+	/** Pawn mesh: 1st person view */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	TSubobjectPtr<class USkeletalMeshComponent> Mesh1P;
+
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -120,7 +121,16 @@ class ASSCharacter : public ACharacter
 
 
 
+	//////////////////////////////////////////////////////
+	//  Player Initialization
 
+	virtual void PostInitializeComponents() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+private:
+
+	UFUNCTION()
+	void InitializePlayer();
 		
 	///////////////////////////////////////////////////////
 	//  Player Vitals
@@ -159,12 +169,40 @@ protected:
 	// Handles sprint start
 	void SprintStart();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSprintStart();
+
 	// Handles sprint end
 	void SprintEnd();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSprintEnd();
+
+	UPROPERTY(Replicated)
+	bool bIsCrouching;
+	UPROPERTY(Replicated)
+	bool bIsPlayerCrouched;
+	float CachedCapsuleHalfHeight;
+	float CrouchInterpValue;
+
+	// handle crouch start
+	void CrouchStart();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerCrouchStart();
+
+	// handle crouch end
+	void CrouchEnd();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerCrouchEnd();
+
+	void CrouchImplementation(float DelaSeconds);
+
+
+
 private:
 
-	UPROPERTY(EditDefaultsOnly, Category = Sprint)
 	float SprintMultiplier;
 
 	float CachedDefaultWalkSpeed;
