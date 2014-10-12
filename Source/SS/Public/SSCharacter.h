@@ -1,7 +1,9 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
 
+#include "SSInventorySlot.h"
 #include "SSItem.h"
+
 
 #include "GameFramework/Character.h"
 #include "SSCharacter.generated.h"
@@ -71,39 +73,6 @@ struct FVitalsStruct {
 	}
 };
 
-USTRUCT()
-struct FInventorySlotStruct{
-
-	GENERATED_USTRUCT_BODY()
-
-	FString ItemName;
-
-	UTexture2D* ItemUIImage;
-
-	int32 MaxStackSize;
-
-	int32 CurrentStackSize;
-
-	TArray<ASSItem*> Items;
-
-	bool IsEmpty(){
-		return CurrentStackSize <= 0 && MaxStackSize <= 0;
-	}
-
-	bool IsFull(){
-		return CurrentStackSize == MaxStackSize;
-	}
-
-
-	FInventorySlotStruct(){
-		ItemName = "NULL";
-		ItemUIImage = NULL;
-		MaxStackSize = -1;
-		CurrentStackSize = -1;
-		Items.Empty();
-	}
-
-};
 
 UCLASS(config=Game)
 class ASSCharacter : public ACharacter
@@ -131,6 +100,9 @@ private:
 
 	UFUNCTION()
 	void InitializePlayer();
+
+	UFUNCTION()
+	void InitializeInventory();
 		
 	///////////////////////////////////////////////////////
 	//  Player Vitals
@@ -148,7 +120,7 @@ protected:
 private:
 
 	UPROPERTY(Replicated)
-		TArray<FInventorySlotStruct> PlayerInventory;
+		TArray<USSInventorySlot*> PlayerInventory;
 
 protected:
 

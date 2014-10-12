@@ -28,8 +28,7 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 
-	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P are set in the
-	// derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	
 
 
 
@@ -56,10 +55,8 @@ void ASSCharacter::Tick(float DeltaSeconds){
 
 void ASSCharacter::PostInitializeComponents(){
 	Super::PostInitializeComponents();
-
-
 	InitializePlayer();
-
+	InitializeInventory();
 }
 
 void ASSCharacter::InitializePlayer(){
@@ -111,9 +108,13 @@ void ASSCharacter::InitializePlayer(){
 	SprintMultiplier = 1.5f;
 	CachedDefaultWalkSpeed = CharacterMovement->MaxWalkSpeed;
 
-	// fill inventory with empty slots
-	for (int32 i = 0; i < 32; i++){
-		//PlayerInventory.Add(FInventorySlotStruct());
+}
+
+void ASSCharacter::InitializeInventory(){
+	if (Role == ROLE_Authority){
+		for (int32 i = 0; i < 32; i++){
+			PlayerInventory.Add(NewObject<USSInventorySlot>());
+		}
 	}
 }
 
