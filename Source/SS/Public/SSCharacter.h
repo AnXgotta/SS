@@ -130,6 +130,12 @@ protected:
 	//////////////////////////////////////////////////////
 	//  Player Movement
 
+private:
+
+	const float MAX_WALK_SPEED = 3.0f;
+	const float CROUCH_SPEED_MULTIPLIER = 0.5f;
+	const float JUMP_VELOCITY = 4.2f;
+
 protected:
 
 	/** Handles moving forward/backward */

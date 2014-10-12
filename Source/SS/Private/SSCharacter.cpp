@@ -28,7 +28,9 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 
-	
+	// replication
+	bReplicateMovement = true;
+	bReplicates = true;
 
 
 
@@ -67,12 +69,12 @@ void ASSCharacter::InitializePlayer(){
 	// character movement setup	
 	if (CharacterMovement){
 		CharacterMovement->MaxStepHeight = 45.0f;
-		CharacterMovement->JumpZVelocity = 420.0f;
+		CharacterMovement->JumpZVelocity = JUMP_VELOCITY * 100.0f;
 		CharacterMovement->SetWalkableFloorAngle(45.0f);
 		CharacterMovement->GravityScale = 1.0;
 		CharacterMovement->GroundFriction = 8.0f;
-		CharacterMovement->MaxWalkSpeed = 600.0f;
-		CharacterMovement->MaxWalkSpeedCrouched = 300.0f;
+		CharacterMovement->MaxWalkSpeed = MAX_WALK_SPEED * 100.0f;
+		CharacterMovement->MaxWalkSpeedCrouched = MAX_WALK_SPEED * CROUCH_SPEED_MULTIPLIER;
 		CharacterMovement->MaxCustomMovementSpeed = 600.0f;
 		CharacterMovement->MaxSwimSpeed = 300.0f;
 		CharacterMovement->MaxAcceleration = 2048.0f;
