@@ -296,7 +296,7 @@ void ASSCharacter::ManagePitch(float Val){
 // Player Interaction
 
 void ASSCharacter::TraceForInteraction(){
-	if (Role == ROLE_Authority || Role == ROLE_SimulatedProxy) return;
+
 	USSConstants::ScreenMessage("Tracing...", 5.0f, FColor::Green);
 	FHitResult HitData(ForceInit);
 	
@@ -305,7 +305,13 @@ void ASSCharacter::TraceForInteraction(){
 
 	if (USSConstants::TraceInteractable(this, Start, End, HitData)){
 		if (HitData.GetActor()){
-			USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
+			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitData.GetActor());
+			if (InteractableActor){
+				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Green);
+			}else{
+				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
+			}
+			
 		}
 	}
 }

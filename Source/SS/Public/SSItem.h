@@ -2,6 +2,7 @@
 
 #pragma once
 #include "SSInventoryItem.h"
+#include "SSInteractable.h"
 
 #include "GameFramework/Actor.h"
 #include "SSItem.generated.h"
@@ -33,7 +34,7 @@ struct FPropertiesStruct{
  * 
  */
 UCLASS()
-class SS_API ASSItem : public AActor, public ISSInventoryItem
+class SS_API ASSItem : public AActor, public ISSInventoryItem, public ISSInteractable
 {
 	GENERATED_UCLASS_BODY()
 

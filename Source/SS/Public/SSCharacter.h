@@ -4,6 +4,7 @@
 #include "SSInventoryContainerBase.h"
 #include "SSItem.h"
 #include "SSConstants.h"
+#include "SSInteractable.h"
 
 #include "GameFramework/Character.h"
 #include "SSCharacter.generated.h"
@@ -75,7 +76,7 @@ struct FVitalsStruct {
 
 
 UCLASS()
-class ASSCharacter : public ACharacter
+class ASSCharacter : public ACharacter, public ISSInteractable
 {
 	GENERATED_UCLASS_BODY()
 
@@ -216,7 +217,7 @@ private:
 	UPROPERTY(Replicated)
 	ASSItem* CurrentInteactableItem;
 
-	const float INTERACTION_RANGE = 200.0f;
+	const float INTERACTION_RANGE = 600.0f;
 
 
 
