@@ -103,7 +103,7 @@ void ASSCharacter::InitializePlayer(){
 		CharacterMovement->bEnableScopedMovementUpdates = true;
 		CharacterMovement->bUseFlatBaseForFloorChecks = false;
 		CharacterMovement->bRequestedMoveUseAcceleration = true;
-		CharacterMovement->bCrouchMovesCharacterDown = true;
+		// 4.5 CONVERSION CharacterMovement->bCrouchMovesCharacterDown = true;
 		
 	}
 	// sprint setup

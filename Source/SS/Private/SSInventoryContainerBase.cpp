@@ -8,6 +8,8 @@
 ASSInventoryContainerBase::ASSInventoryContainerBase(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	Mesh = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("Mesh"));
+
 	CurrentWeight = 0.0f;
 	WeightCapacity = -1.0f;
 	InventoryContainerType = EInventoryContainerEnum::IC_NULL;
