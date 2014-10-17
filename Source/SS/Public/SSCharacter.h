@@ -182,11 +182,17 @@ protected:
 
 	void CrouchImplementation(float DelaSeconds);
 
+	void ManagePitch(float Val);
+
 private:
 
 		float SprintMultiplier;
 
 		float CachedDefaultWalkSpeed;
+
+		// No rotation = 0, look down (camera rotates up) = 360 - 300, look up (camera rotates down) = 0 - 60
+		const float PITCH_UPPER_LIMIT = 60.0f;
+		const float PITCH_LOWER_LIMIT = 300.0f;
 
 
 	///////////////////////////////////////////////////////////

@@ -122,6 +122,7 @@ void ASSCharacter::InitializePlayer(){
 	SprintMultiplier = 1.5f;
 	CachedDefaultWalkSpeed = CharacterMovement->MaxWalkSpeed;
 
+
 }
 
 
@@ -260,6 +261,30 @@ void ASSCharacter::CrouchImplementation(float DeltaSeconds){
 	}
 }
 
+void ASSCharacter::ManagePitch(float Val){
+	if (!Controller || !CameraComponent || !CameraBoom) return;
+
+	float ControllerPitch = Controller->GetControlRotation().Pitch;
+
+	if (CameraComponent->GetComponentLocation().Z >= CameraBoom->GetComponentLocation().Z){
+		if (ControllerPitch < PITCH_LOWER_LIMIT){
+			APawn::AddControllerPitchInput(FMath::Min(0.0f, Val));
+		}else{
+			APawn::AddControllerPitchInput(Val);
+		}
+		return;
+	}
+
+	if (CameraComponent->GetComponentLocation().Z <= CameraBoom->GetComponentLocation().Z){
+		if (ControllerPitch > PITCH_UPPER_LIMIT){
+			APawn::AddControllerPitchInput(FMath::Max(0.0f, Val));
+		}else{
+			APawn::AddControllerPitchInput(Val);
+		}
+		return;
+	}	
+}
+
 ////////////////////////////////////////////////////////////////////////
 // Player Interaction
 
@@ -320,7 +345,7 @@ void ASSCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAxis("MoveRight", this, &ASSCharacter::MoveRight);
 
 	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	InputComponent->BindAxis("LookUp", this, &ASSCharacter::ManagePitch);
 }
 
 
