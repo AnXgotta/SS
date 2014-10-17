@@ -3,7 +3,7 @@
 
 #include "SSInventoryContainerBase.h"
 #include "SSItem.h"
-
+#include "SSConstants.h"
 
 #include "GameFramework/Character.h"
 #include "SSCharacter.generated.h"
@@ -23,7 +23,7 @@ struct FVitalsStruct {
 	}
 
 	UPROPERTY()
-	float Stamina;
+		float Stamina;
 
 	// Adjust Stamina
 	void AdjustStamina(float Value){
@@ -31,7 +31,7 @@ struct FVitalsStruct {
 	}
 
 	UPROPERTY()
-	float Hunger;
+		float Hunger;
 
 	// Adjust Hunger
 	void AdjustHunger(float Value){
@@ -39,7 +39,7 @@ struct FVitalsStruct {
 	}
 
 	UPROPERTY()
-	float Thirst;
+		float Thirst;
 
 	// Adjust Thirst
 	void AdjustThirst(float Value){
@@ -47,7 +47,7 @@ struct FVitalsStruct {
 	}
 
 	UPROPERTY()
-	float Infection;
+		float Infection;
 
 	// Adjust Infection
 	void AdjustInfection(float Value){
@@ -55,7 +55,7 @@ struct FVitalsStruct {
 	}
 
 	UPROPERTY()
-	float Temperature;
+		float Temperature;
 
 	// Adjust Temperature
 	void AdjustTemperature(float Value){
@@ -74,7 +74,7 @@ struct FVitalsStruct {
 };
 
 
-UCLASS(config=Game)
+UCLASS()
 class ASSCharacter : public ACharacter
 {
 	GENERATED_UCLASS_BODY()
@@ -86,7 +86,7 @@ class ASSCharacter : public ACharacter
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TSubobjectPtr<class UCameraComponent> FirstPersonCameraComponent;
+	TSubobjectPtr<class UCameraComponent> CameraComponent;
 
 
 
@@ -101,8 +101,6 @@ private:
 	UFUNCTION()
 	void InitializePlayer();
 
-	UFUNCTION()
-	void InitializeInventory();
 		
 	///////////////////////////////////////////////////////
 	//  Player Vitals
@@ -144,19 +142,18 @@ private:
 
 protected:
 
-	/** Handles moving forward/backward */
+	///////////////////////////////////////////////////////////
+	// Player Movement
+
 	void MoveForward(float Val);
 
-	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
 
-	// Handles sprint start
 	void SprintStart();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSprintStart();
 
-	// Handles sprint end
 	void SprintEnd();
 
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -169,13 +166,11 @@ protected:
 	float CachedCapsuleHalfHeight;
 	float CrouchInterpValue;
 
-	// handle crouch start
 	void CrouchStart();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerCrouchStart();
 
-	// handle crouch end
 	void CrouchEnd();
 
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -183,13 +178,35 @@ protected:
 
 	void CrouchImplementation(float DelaSeconds);
 
+private:
+
+		float SprintMultiplier;
+
+		float CachedDefaultWalkSpeed;
+
+
+	///////////////////////////////////////////////////////////
+	// Player Interaction
+protected:
+
+	void TraceForInteraction();
+
+	void Interact();
+
+	// [Server] Check with server to see if we can interact with object
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerInteract();
+
+	// [Client] Server to client to give go/no-go on interaction
+	UFUNCTION(Client, Reliable, WithValidation)
+	void ServerInteractResponse(bool bInteract);
 
 
 private:
+	UPROPERTY(Replicated)
+	ASSItem* CurrentInteactableItem;
 
-	float SprintMultiplier;
-
-	float CachedDefaultWalkSpeed;
+	const float INTERACTION_RANGE = 200.0f;
 
 
 

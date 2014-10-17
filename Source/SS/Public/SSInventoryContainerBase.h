@@ -66,7 +66,7 @@ class SS_API ASSInventoryContainerBase : public AActor, public ISSInventoryConta
 	GENERATED_UCLASS_BODY()
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	TSubobjectPtr<class USkeletalMeshComponent> Mesh;
+	TSubobjectPtr<class UStaticMeshComponent> Mesh;
 
 private:
 	// Container Indentifier

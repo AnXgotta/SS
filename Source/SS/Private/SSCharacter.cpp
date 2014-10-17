@@ -16,14 +16,14 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
 
 	// Create a CameraComponent	
-	FirstPersonCameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->AttachParent = CapsuleComponent;
-	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
+	CameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("Camera"));
+	CameraComponent->AttachParent = CapsuleComponent;
+	CameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(false);
-	Mesh1P->AttachParent = FirstPersonCameraComponent;
+	Mesh1P->AttachParent = CameraComponent;
 	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -150.f);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
@@ -58,7 +58,6 @@ void ASSCharacter::Tick(float DeltaSeconds){
 void ASSCharacter::PostInitializeComponents(){
 	Super::PostInitializeComponents();
 	InitializePlayer();
-	InitializeInventory();
 }
 
 void ASSCharacter::InitializePlayer(){
@@ -112,13 +111,6 @@ void ASSCharacter::InitializePlayer(){
 
 }
 
-void ASSCharacter::InitializeInventory(){
-	if (Role == ROLE_Authority){
-		for (int32 i = 0; i < 32; i++){
-//			PlayerInventory.Add(NewObject<USSInventorySlot>());
-		}
-	}
-}
 
 
 
@@ -255,6 +247,45 @@ void ASSCharacter::CrouchImplementation(float DeltaSeconds){
 	}
 }
 
+////////////////////////////////////////////////////////////////////////
+// Player Interaction
+
+void ASSCharacter::TraceForInteraction(){
+	if (Role == ROLE_Authority || Role == ROLE_SimulatedProxy) return;
+	USSConstants::ScreenMessage("Tracing...", 5.0f, FColor::Green);
+	FHitResult HitData(ForceInit);
+	
+	const FVector Start = this->CameraComponent.Get()->GetComponentLocation();
+	const FVector End = Start + GetControlRotation().Vector() * INTERACTION_RANGE;
+
+	if (USSConstants::TraceInteractable(this, Start, End, HitData)){
+		if (HitData.GetActor()){
+			USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
+		}
+	}
+}
+
+void ASSCharacter::Interact(){
+	TraceForInteraction();
+}
+
+bool ASSCharacter::ServerInteract_Validate(){
+	return true;
+}
+
+void ASSCharacter::ServerInteract_Implementation(){
+
+}
+
+bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
+	return true;
+}
+
+void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
+
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Player Input Management
 
@@ -263,10 +294,14 @@ void ASSCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	check(InputComponent);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	InputComponent->BindAction("LeftShift", IE_Pressed, this, &ASSCharacter::SprintStart);
-	InputComponent->BindAction("LeftShift", IE_Released, this, &ASSCharacter::SprintEnd);
-	InputComponent->BindAction("LeftCtrl", IE_Pressed, this, &ASSCharacter::CrouchStart);
-	InputComponent->BindAction("LeftCtrl", IE_Released, this, &ASSCharacter::CrouchEnd);
+
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &ASSCharacter::SprintStart);
+	InputComponent->BindAction("Sprint", IE_Released, this, &ASSCharacter::SprintEnd);
+
+	InputComponent->BindAction("Crouch", IE_Pressed, this, &ASSCharacter::CrouchStart);
+	InputComponent->BindAction("Crouch", IE_Released, this, &ASSCharacter::CrouchEnd);
+
+	InputComponent->BindAction("Interact", IE_Pressed, this, &ASSCharacter::Interact);
 
 	InputComponent->BindAxis("MoveForward", this, &ASSCharacter::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ASSCharacter::MoveRight);
@@ -287,6 +322,8 @@ void ASSCharacter::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerClothes, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerBelt, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerPack, COND_OwnerOnly);
+
+	DOREPLIFETIME_CONDITION(ASSCharacter, CurrentInteactableItem, COND_OwnerOnly);
 
 	DOREPLIFETIME(ASSCharacter, bIsCrouching);
 	DOREPLIFETIME(ASSCharacter, bIsPlayerCrouched);
