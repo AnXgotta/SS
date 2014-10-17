@@ -27,6 +27,7 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	CameraBoom = PCIP.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetOffset.Z = 30.0f;
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	CameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("Camera"));
@@ -262,12 +263,16 @@ void ASSCharacter::CrouchImplementation(float DeltaSeconds){
 }
 
 void ASSCharacter::ManagePitch(float Val){
-	if (!Controller || !CameraComponent || !CameraBoom) return;
+	APawn::AddControllerPitchInput(Val);
+	/*  TODO:  Add Rotation Restrictions
+	if (!Controller) return;
 
 	float ControllerPitch = Controller->GetControlRotation().Pitch;
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("CPitch = %f, Val = %f, Camera Higher than Boom = %d"), ControllerPitch, Val, CameraBoom->GetComponentLocation().Z < CameraComponent->GetComponentLocation().Z));
+
 	if (CameraComponent->GetComponentLocation().Z >= CameraBoom->GetComponentLocation().Z){
-		if (ControllerPitch < PITCH_LOWER_LIMIT){
+		if (ControllerPitch < 300.0f){
 			APawn::AddControllerPitchInput(FMath::Min(0.0f, Val));
 		}else{
 			APawn::AddControllerPitchInput(Val);
@@ -276,13 +281,15 @@ void ASSCharacter::ManagePitch(float Val){
 	}
 
 	if (CameraComponent->GetComponentLocation().Z <= CameraBoom->GetComponentLocation().Z){
-		if (ControllerPitch > PITCH_UPPER_LIMIT){
+		if (ControllerPitch > 60.0f){
 			APawn::AddControllerPitchInput(FMath::Max(0.0f, Val));
 		}else{
 			APawn::AddControllerPitchInput(Val);
 		}
 		return;
 	}	
+
+	*/
 }
 
 ////////////////////////////////////////////////////////////////////////
