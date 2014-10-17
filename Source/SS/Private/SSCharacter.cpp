@@ -15,18 +15,30 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	// Set size for collision capsule
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
 
-	// Create a CameraComponent	
-	CameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("Camera"));
-	CameraComponent->AttachParent = CapsuleComponent;
-	CameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
+	// set our turn rates for input
+	BaseTurnRate = 45.f;
+	BaseLookUpRate = 45.f;
 
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
-	Mesh1P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(false);
-	Mesh1P->AttachParent = CameraComponent;
-	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -150.f);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
+	// Configure character movement
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = true;
+
+	CameraBoom = PCIP.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("CameraBoom"));
+	CameraBoom->AttachTo(RootComponent);
+	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
+	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+	CameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("Camera"));
+	CameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	CameraComponent->bUsePawnControlRotation = true;
+
+	
+	Mesh->SetOnlyOwnerSee(false);
+	Mesh->AttachParent = CapsuleComponent;
+	Mesh->RelativeLocation = FVector(0.f, 0.f, -150.f);
+	Mesh->bCastDynamicShadow = true;
+	Mesh->CastShadow = true;
 
 	// replication
 	bReplicateMovement = true;
@@ -67,6 +79,7 @@ void ASSCharacter::InitializePlayer(){
 	
 	// character movement setup	
 	if (CharacterMovement){
+
 		CharacterMovement->MaxStepHeight = 45.0f;
 		CharacterMovement->JumpZVelocity = JUMP_VELOCITY * 100.0f;
 		CharacterMovement->SetWalkableFloorAngle(45.0f);

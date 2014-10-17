@@ -79,15 +79,19 @@ class ASSCharacter : public ACharacter
 {
 	GENERATED_UCLASS_BODY()
 
-	/** Pawn mesh: 1st person view */
-	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	TSubobjectPtr<class USkeletalMeshComponent> Mesh1P;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		TSubobjectPtr<class UCameraComponent> CameraComponent;
 
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TSubobjectPtr<class UCameraComponent> CameraComponent;
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseTurnRate;
 
+	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseLookUpRate;
 
 
 	//////////////////////////////////////////////////////
