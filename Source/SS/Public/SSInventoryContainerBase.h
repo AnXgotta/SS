@@ -42,7 +42,7 @@ struct FContainerSlot {
 	}
 
 	ASSItem* RemoveItem() {
-		ASSItem* RemovedItem = Items.Pop();
+		return Items.Pop();
 	}
 
 	bool IsEmpty() {
@@ -106,7 +106,7 @@ protected:
 		TArray<FContainerSlot> GetItemMap();
 
 	UFUNCTION()
-		void AddItemNewContainerSlot(ASSItem* ASSItem);
+		void AddItemNewContainerSlot(ASSItem* NewItem);
 
 	UFUNCTION()
 		bool ContainsItem(FString ItemName);
