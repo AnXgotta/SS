@@ -1,7 +1,7 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
 
-#include "SSInventorySlot.h"
+#include "SSInventoryContainerBase.h"
 #include "SSItem.h"
 
 
@@ -119,8 +119,14 @@ protected:
 
 private:
 
-	UPROPERTY(Replicated)
-		TArray<USSInventorySlot*> PlayerInventory;
+	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
+		ASSInventoryContainerBase* PlayerClothes;
+
+	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
+		ASSInventoryContainerBase* PlayerBelt;
+
+	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
+		ASSInventoryContainerBase* PlayerPack;
 
 protected:
 

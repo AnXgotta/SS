@@ -115,7 +115,7 @@ void ASSCharacter::InitializePlayer(){
 void ASSCharacter::InitializeInventory(){
 	if (Role == ROLE_Authority){
 		for (int32 i = 0; i < 32; i++){
-			PlayerInventory.Add(NewObject<USSInventorySlot>());
+//			PlayerInventory.Add(NewObject<USSInventorySlot>());
 		}
 	}
 }
@@ -283,7 +283,10 @@ void ASSCharacter::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerVitals, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerInventory, COND_OwnerOnly);
+
+	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerClothes, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerBelt, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerPack, COND_OwnerOnly);
 
 	DOREPLIFETIME(ASSCharacter, bIsCrouching);
 	DOREPLIFETIME(ASSCharacter, bIsPlayerCrouched);

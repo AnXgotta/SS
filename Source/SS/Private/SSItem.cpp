@@ -21,3 +21,14 @@ FPropertiesStruct ASSItem::GetItemProperties(){
 	return ItemProperties;
 }
 
+
+///////////////////////////////////////////////////
+// Funcitonality
+
+void ASSItem::OnAddedToContainer(){
+
+}
+
+void ASSItem::OnRemovedFromContainer(){
+
+}

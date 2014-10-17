@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "SSInventoryItem.h"
 
 #include "GameFramework/Actor.h"
 #include "SSItem.generated.h"
@@ -12,14 +13,17 @@ struct FPropertiesStruct{
 
 	FString ItemName;
 
+	FString ItemDescription;
+
 	UTexture2D* ItemUIImage;
 
-	int32 MaxStackSize;
+	float ItemWeight;
 
 	FPropertiesStruct(){
 		ItemName = "NULL";
+		ItemDescription = "NULL";
 		ItemUIImage = NULL;
-		MaxStackSize = -1;
+		ItemWeight = -1.0f;
 	}
 
 };
@@ -29,7 +33,7 @@ struct FPropertiesStruct{
  * 
  */
 UCLASS()
-class SS_API ASSItem : public AActor
+class SS_API ASSItem : public AActor, public ISSInventoryItem
 {
 	GENERATED_UCLASS_BODY()
 
@@ -50,6 +54,11 @@ public:
 	FPropertiesStruct GetItemProperties();
 
 
-	
-	
+	///////////////////////////////////////////////////
+	// Funcitonality
+
+	void OnAddedToContainer();
+
+	void OnRemovedFromContainer();
+
 };
