@@ -22,5 +22,5 @@ void ISSInteractable::OnNotRecognized(){
 
 
 void ISSInteractable::OnInteract(){
-
+	USSConstants::ScreenMessage("OnInteract", 5.0f, FColor::Yellow);
 }

@@ -2,7 +2,6 @@
 
 #pragma once
 #include "SSItem.h"
-#include "SSInventoryContainer.h"
 #include "SSInteractable.h"
 
 #include "GameFramework/Actor.h"
@@ -62,7 +61,7 @@ struct FContainerSlot {
 
 
 UCLASS()
-class SS_API ASSInventoryContainerBase : public AActor, public ISSInventoryContainer, public ISSInteractable
+class SS_API ASSInventoryContainerBase : public AActor, public ISSInteractable
 {
 	GENERATED_UCLASS_BODY()
 

@@ -345,25 +345,29 @@ void ASSCharacter::TraceForObjectRecognition(){
 }
 
 void ASSCharacter::TraceForObjectInteraction(){
-
+	// if local player
 	if (Role == ROLE_AutonomousProxy){
+		// if currently looking at interactable object
 		if (CurrentRecognizedInteractableObject){
+			// tell the server
 			ServerInteract();
 		}
 		return;
 	}
-
+	// if server 
 	USSConstants::ScreenMessage("Tracing...", 5.0f, FColor::Green);
-	FHitResult HitData(ForceInit);
-	
+	// create and initialize hit data
+	FHitResult HitData(ForceInit);	
+	// get start and end position of trace
 	FVector CapsuleHeadLocation = CapsuleComponent->GetComponentLocation();
 	CapsuleHeadLocation.Z += (CapsuleComponent->GetScaledCapsuleHalfHeight() - 20.0f);
-
 	const FVector Start = CapsuleHeadLocation;
 	const FVector End = CameraComponent->GetComponentLocation() + GetControlRotation().Vector() * INTERACTION_RANGE;
-
+	// trace for interactable object
 	if (USSConstants::TraceInteractable(this, Start, End, HitData)){
+		// if hit object
 		if (HitData.GetActor()){
+			// check if object is interactable, if yes then tell the client to do things
 			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitData.GetActor());
 			if (InteractableActor){
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Green);
@@ -371,8 +375,7 @@ void ASSCharacter::TraceForObjectInteraction(){
 			}else{
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
 				ServerInteractResponse(false);
-			}
-			
+			}			
 		}
 	}
 }
@@ -394,12 +397,14 @@ bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
 }
 
 void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
+	// server responded to client not to interact
 	if (!bInteract){
 		USSConstants::ScreenMessage("Do not interact with actor (is NULL)", 5.0f, FColor::Red);
 		return;
 	}
-
+	// server responded to client to interact
 	USSConstants::ScreenMessage("Do interact with actor", 5.0f, FColor::Green);
+	InterfaceCast<ISSInteractable>(CurrentRecognizedInteractableObject)->OnInteract();	
 }
 
 
@@ -439,8 +444,6 @@ void ASSCharacter::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerClothes, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerBelt, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerPack, COND_OwnerOnly);
-
-	//DOREPLIFETIME_CONDITION(ASSCharacter, CurrentInteractableItem, COND_OwnerOnly);
 
 	DOREPLIFETIME(ASSCharacter, bIsCrouching);
 	DOREPLIFETIME(ASSCharacter, bIsPlayerCrouched);
