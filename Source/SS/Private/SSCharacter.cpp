@@ -403,6 +403,8 @@ void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
 		return;
 	}
 	// server responded to client to interact
+	// if user looked away from item before response... do nothing
+	if (!CurrentRecognizedInteractableObject) return;
 	USSConstants::ScreenMessage("Do interact with actor", 5.0f, FColor::Green);
 	InterfaceCast<ISSInteractable>(CurrentRecognizedInteractableObject)->OnInteract();	
 }

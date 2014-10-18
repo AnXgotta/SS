@@ -9,6 +9,8 @@ ASSInventoryContainerBase::ASSInventoryContainerBase(const class FPostConstructI
 	: Super(PCIP)
 {
 	Mesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Mesh"));
+	Mesh->AttachTo(RootComponent);
+	Mesh->AttachParent = RootComponent;
 
 	CurrentWeight = 0.0f;
 	WeightCapacity = -1.0f;

@@ -2,6 +2,7 @@
 
 #pragma once
 #include "SSInteractable.h"
+#include "SSConstants.h"
 
 #include "GameFramework/Actor.h"
 #include "SSItem.generated.h"
@@ -11,12 +12,16 @@ struct FPropertiesStruct{
 
 	GENERATED_USTRUCT_BODY()
 
+	UPROPERTY(EditAnywhere, Category = Item)
 	FString ItemName;
 
+	UPROPERTY(EditAnywhere, Category = Item)
 	FString ItemDescription;
 
+	UPROPERTY(EditAnywhere, Category = Item)
 	UTexture2D* ItemUIImage;
 
+	UPROPERTY(EditAnywhere, Category = Item)
 	float ItemWeight;
 
 	FPropertiesStruct(){
@@ -37,12 +42,20 @@ class SS_API ASSItem : public AActor, public ISSInteractable
 {
 	GENERATED_UCLASS_BODY()
 
+	UPROPERTY()
+	TSubobjectPtr<class USceneComponent> SceneComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Item)
+	TSubobjectPtr<class USphereComponent> TraceComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Item)
+	TSubobjectPtr<class UStaticMeshComponent> Mesh;
 
 	///////////////////////////////////////////////////
 	//  Item Properties
 
 protected:
-
+	UPROPERTY(EditAnywhere, Category = ItemProperties)
 	FPropertiesStruct ItemProperties;
 
 
@@ -60,5 +73,15 @@ public:
 	void OnAddedToContainer();
 
 	void OnRemovedFromContainer();
+
+
+	///////////////////////////////////////////////////
+	// Interaction
+
+	virtual void OnRecognized();
+
+	virtual void OnNotRecognized();
+
+	virtual void OnInteract();
 
 };
