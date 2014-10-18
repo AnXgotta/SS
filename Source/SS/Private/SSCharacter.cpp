@@ -316,10 +316,9 @@ void ASSCharacter::TraceForObjectRecognition(){
 			// check if interactable type
 			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitActor);
 			if (InteractableActor){
-				USSConstants::ScreenMessage(HitActor->GetName(), 5.0f, FColor::Green);
 				// if first recognition of object
 				if (!CurrentRecognizedInteractableObject){
-					//InteractableActor->OnRecognized();
+					InteractableActor->OnRecognized();
 					CurrentRecognizedInteractableObject = HitActor;
 					return;
 				}// if same object 
@@ -328,16 +327,14 @@ void ASSCharacter::TraceForObjectRecognition(){
 				}// new object
 				else{
 					// un-recognize previouse object, assign new object, recognize new object
-					//InteractableActor->OnNotRecognized();
+					InteractableActor->OnNotRecognized();
 					CurrentRecognizedInteractableObject = HitActor;
-					//InteractableActor->OnRecognized();
+					InteractableActor->OnRecognized();
 					return;
 				}
 
-			}// no interactable object hit
-			else{
-				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
 			}
+			// no interactable object hit
 		}		
 	}
 	// no object hit or hit actor was not interactable or hit actor is null
