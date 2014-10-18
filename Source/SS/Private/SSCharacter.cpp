@@ -300,16 +300,30 @@ void ASSCharacter::TraceForInteraction(){
 	USSConstants::ScreenMessage("Tracing...", 5.0f, FColor::Green);
 	FHitResult HitData(ForceInit);
 	
-	const FVector Start = this->CameraComponent.Get()->GetComponentLocation();
-	const FVector End = Start + GetControlRotation().Vector() * INTERACTION_RANGE;
+	FVector CapsuleHeadLocation = CapsuleComponent->GetComponentLocation();
+	CapsuleHeadLocation.Z += (CapsuleComponent->GetScaledCapsuleHalfHeight() - 20.0f);
+
+	const FVector Start = CapsuleHeadLocation;
+	const FVector End = CameraComponent->GetComponentLocation() + GetControlRotation().Vector() * INTERACTION_RANGE;
 
 	if (USSConstants::TraceInteractable(this, Start, End, HitData)){
 		if (HitData.GetActor()){
 			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitData.GetActor());
 			if (InteractableActor){
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Green);
+				CurrentInteractableItem = HitData.GetActor();
+				if (Role == ROLE_Authority){
+					ServerInteractResponse(true);
+				} else {
+					ServerInteract();
+				}
+				
 			}else{
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
+				CurrentInteractableItem = NULL;
+				if (Role == ROLE_Authority){
+					ServerInteractResponse(false);
+				}
 			}
 			
 		}
@@ -325,7 +339,7 @@ bool ASSCharacter::ServerInteract_Validate(){
 }
 
 void ASSCharacter::ServerInteract_Implementation(){
-
+	TraceForInteraction();
 }
 
 bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
@@ -333,7 +347,13 @@ bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
 }
 
 void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
+	if (!bInteract){
+		USSConstants::ScreenMessage("Interact actor NULL", 5.0f, FColor::Red);
+		CurrentInteractableItem = NULL;
+		return;
+	}
 
+	USSConstants::ScreenMessage("Do interact with actor", 5.0f, FColor::Green);
 }
 
 
@@ -374,7 +394,7 @@ void ASSCharacter::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerBelt, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerPack, COND_OwnerOnly);
 
-	DOREPLIFETIME_CONDITION(ASSCharacter, CurrentInteactableItem, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ASSCharacter, CurrentInteractableItem, COND_OwnerOnly);
 
 	DOREPLIFETIME(ASSCharacter, bIsCrouching);
 	DOREPLIFETIME(ASSCharacter, bIsPlayerCrouched);

@@ -75,6 +75,8 @@ struct FVitalsStruct {
 };
 
 
+//Controller->IsLocalPlayerController();
+
 UCLASS()
 class ASSCharacter : public ACharacter, public ISSInteractable
 {
@@ -215,9 +217,9 @@ protected:
 
 private:
 	UPROPERTY(Replicated)
-	ASSItem* CurrentInteactableItem;
+	AActor* CurrentInteractableItem;
 
-	const float INTERACTION_RANGE = 600.0f;
+	const float INTERACTION_RANGE = 500.0f;
 
 
 

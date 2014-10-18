@@ -21,10 +21,10 @@ class SS_API USSConstants : public UObject
 		FCollisionQueryParams TraceParams(FName(TEXT("Trace Interactable")), true, ActorToIgnore);
 		TraceParams.bTraceComplex = true;
 		//TraceParams.bTraceAsyncScene = true;
-		TraceParams.bReturnPhysicalMaterial = ReturnPhysMat;
+		//TraceParams.bReturnPhysicalMaterial = ReturnPhysMat;
 
 		// Ignore Actors
-		TraceParams.AddIgnoredActor(ActorToIgnore);
+		//TraceParams.AddIgnoredActor(ActorToIgnore);
 
 		// Re-initialize hit info
 		HitOut = FHitResult(ForceInit);
