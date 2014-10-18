@@ -66,6 +66,8 @@ void ASSCharacter::Tick(float DeltaSeconds){
 
 	CrouchImplementation(DeltaSeconds);
 
+	TraceForObjectRecognition();
+
 }
 
 void ASSCharacter::PostInitializeComponents(){
@@ -295,7 +297,64 @@ void ASSCharacter::ManagePitch(float Val){
 ////////////////////////////////////////////////////////////////////////
 // Player Interaction
 
-void ASSCharacter::TraceForInteraction(){
+void ASSCharacter::TraceForObjectRecognition(){
+	if (Role == ROLE_SimulatedProxy || Role == ROLE_Authority) return;
+
+	FHitResult HitData(ForceInit);
+
+	FVector CapsuleHeadLocation = CapsuleComponent->GetComponentLocation();
+	CapsuleHeadLocation.Z += (CapsuleComponent->GetScaledCapsuleHalfHeight() - 20.0f);
+
+	const FVector Start = CapsuleHeadLocation;
+	const FVector End = CameraComponent->GetComponentLocation() + GetControlRotation().Vector() * INTERACTION_RANGE;
+
+	// trace for interactable object
+	if (USSConstants::TraceInteractable(this, Start, End, HitData)){
+		AActor* HitActor = HitData.GetActor();
+		// if hit object
+		if (HitActor){
+			// check if interactable type
+			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitActor);
+			if (InteractableActor){
+				USSConstants::ScreenMessage(HitActor->GetName(), 5.0f, FColor::Green);
+				// if first recognition of object
+				if (!CurrentRecognizedInteractableObject){
+					//InteractableActor->OnRecognized();
+					CurrentRecognizedInteractableObject = HitActor;
+					return;
+				}// if same object 
+				else if (CurrentRecognizedInteractableObject == HitActor){
+					return;
+				}// new object
+				else{
+					// un-recognize previouse object, assign new object, recognize new object
+					//InteractableActor->OnNotRecognized();
+					CurrentRecognizedInteractableObject = HitActor;
+					//InteractableActor->OnRecognized();
+					return;
+				}
+
+			}// no interactable object hit
+			else{
+				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
+			}
+		}		
+	}
+	// no object hit or hit actor was not interactable or hit actor is null
+	if (CurrentRecognizedInteractableObject){
+		InterfaceCast<ISSInteractable>(CurrentRecognizedInteractableObject)->OnNotRecognized();
+		CurrentRecognizedInteractableObject = NULL;
+	}
+}
+
+void ASSCharacter::TraceForObjectInteraction(){
+
+	if (Role == ROLE_AutonomousProxy){
+		if (CurrentRecognizedInteractableObject){
+			ServerInteract();
+		}
+		return;
+	}
 
 	USSConstants::ScreenMessage("Tracing...", 5.0f, FColor::Green);
 	FHitResult HitData(ForceInit);
@@ -311,19 +370,10 @@ void ASSCharacter::TraceForInteraction(){
 			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitData.GetActor());
 			if (InteractableActor){
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Green);
-				CurrentInteractableItem = HitData.GetActor();
-				if (Role == ROLE_Authority){
-					ServerInteractResponse(true);
-				} else {
-					ServerInteract();
-				}
-				
+				ServerInteractResponse(true);		
 			}else{
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
-				CurrentInteractableItem = NULL;
-				if (Role == ROLE_Authority){
-					ServerInteractResponse(false);
-				}
+				ServerInteractResponse(false);
 			}
 			
 		}
@@ -331,7 +381,7 @@ void ASSCharacter::TraceForInteraction(){
 }
 
 void ASSCharacter::Interact(){
-	TraceForInteraction();
+	TraceForObjectInteraction();
 }
 
 bool ASSCharacter::ServerInteract_Validate(){
@@ -339,7 +389,7 @@ bool ASSCharacter::ServerInteract_Validate(){
 }
 
 void ASSCharacter::ServerInteract_Implementation(){
-	TraceForInteraction();
+	TraceForObjectInteraction();
 }
 
 bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
@@ -348,8 +398,7 @@ bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
 
 void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
 	if (!bInteract){
-		USSConstants::ScreenMessage("Interact actor NULL", 5.0f, FColor::Red);
-		CurrentInteractableItem = NULL;
+		USSConstants::ScreenMessage("Do not interact with actor (is NULL)", 5.0f, FColor::Red);
 		return;
 	}
 
@@ -394,7 +443,7 @@ void ASSCharacter::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerBelt, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ASSCharacter, PlayerPack, COND_OwnerOnly);
 
-	DOREPLIFETIME_CONDITION(ASSCharacter, CurrentInteractableItem, COND_OwnerOnly);
+	//DOREPLIFETIME_CONDITION(ASSCharacter, CurrentInteractableItem, COND_OwnerOnly);
 
 	DOREPLIFETIME(ASSCharacter, bIsCrouching);
 	DOREPLIFETIME(ASSCharacter, bIsPlayerCrouched);

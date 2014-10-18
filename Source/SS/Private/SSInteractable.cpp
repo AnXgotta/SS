@@ -9,3 +9,17 @@ USSInteractable::USSInteractable(const class FPostConstructInitializeProperties&
 {
 
 }
+
+
+void ISSInteractable::OnRecognized(){
+
+}
+
+void ISSInteractable::OnNotRecognized(){
+
+}
+
+
+void ISSInteractable::OnInteract(){
+
+}

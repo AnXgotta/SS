@@ -202,7 +202,9 @@ private:
 	// Player Interaction
 protected:
 
-	void TraceForInteraction();
+	void TraceForObjectRecognition();
+
+	void TraceForObjectInteraction();
 
 	void Interact();
 
@@ -216,8 +218,8 @@ protected:
 
 
 private:
-	UPROPERTY(Replicated)
-	AActor* CurrentInteractableItem;
+	UPROPERTY()
+		AActor* CurrentRecognizedInteractableObject;
 
 	const float INTERACTION_RANGE = 500.0f;
 

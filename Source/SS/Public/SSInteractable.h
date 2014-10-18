@@ -18,6 +18,11 @@ class ISSInteractable{
 
 public:
 
+	virtual void OnRecognized();
+
+	virtual void OnNotRecognized();
+
+	virtual void OnInteract();
 
 
 };

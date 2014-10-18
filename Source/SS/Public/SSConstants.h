@@ -32,7 +32,7 @@ class SS_API USSConstants : public UObject
 		// Get World Context
 		TObjectIterator< APlayerController > ThePC;
 		if (!ThePC) return false;
-
+		
 		DrawDebugLine(ThePC->GetWorld(), Start, End, FColor::Green, true, -1.f, 0, 1.0f);
 
 		// Trace
