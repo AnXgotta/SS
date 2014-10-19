@@ -129,7 +129,22 @@ void ASSCharacter::InitializePlayer(){
 }
 
 
+////////////////////////////////////////////////////////////////////////
+//  Player Inventory
 
+bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
+	bool bItemWasAdded = false;
+	if (!bItemWasAdded && PlayerClothes){
+		bItemWasAdded = PlayerClothes->AddItem(ItemToAdd);
+	}
+	if (!bItemWasAdded && PlayerBelt){
+		bItemWasAdded = PlayerBelt->AddItem(ItemToAdd);
+	}
+	if (!bItemWasAdded && PlayerPack){
+		bItemWasAdded = PlayerPack->AddItem(ItemToAdd);
+	}
+	return bItemWasAdded;
+}
 
 ////////////////////////////////////////////////////////////////////////
 //  Player Movement
@@ -406,7 +421,25 @@ void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
 	// if user looked away from item before response... do nothing
 	if (!CurrentRecognizedInteractableObject) return;
 	USSConstants::ScreenMessage("Do interact with actor", 5.0f, FColor::Green);
-	InterfaceCast<ISSInteractable>(CurrentRecognizedInteractableObject)->OnInteract();	
+	
+	bool bWasInteractionHandled = false;
+
+	// check if object is an item
+	ASSItem* InteractedItem = Cast<ASSItem>(CurrentRecognizedInteractableObject);
+	if (InteractedItem){
+		USSConstants::ScreenMessage("Item Interaction", 5.0f, FColor::Green);
+		if (!bWasInteractionHandled && AddItemToInventory(InteractedItem)){
+			bWasInteractionHandled = true;
+			InterfaceCast<ISSInteractable>(InteractedItem)->OnInteract();
+		}		
+	}
+	
+	// check if object is an inventory container
+	ASSInventoryContainerBase* InteractedInventoryItem = Cast<ASSInventoryContainerBase>(CurrentRecognizedInteractableObject);
+	if (bWasInteractionHandled && InteractedInventoryItem){
+		USSConstants::ScreenMessage("Inventory Item Interaction", 5.0f, FColor::Green);
+		bWasInteractionHandled = true;
+	}
 }
 
 

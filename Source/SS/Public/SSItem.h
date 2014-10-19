@@ -38,18 +38,10 @@ struct FPropertiesStruct{
  * 
  */
 UCLASS()
-class SS_API ASSItem : public AActor, public ISSInteractable
+class SS_API ASSItem : public AStaticMeshActor, public ISSInteractable
 {
 	GENERATED_UCLASS_BODY()
 
-	UPROPERTY()
-	TSubobjectPtr<class USceneComponent> SceneComponent;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Item)
-	TSubobjectPtr<class USphereComponent> TraceComponent;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Item)
-	TSubobjectPtr<class UStaticMeshComponent> Mesh;
 
 	///////////////////////////////////////////////////
 	//  Item Properties

@@ -61,12 +61,9 @@ struct FContainerSlot {
 
 
 UCLASS()
-class SS_API ASSInventoryContainerBase : public AActor, public ISSInteractable
+class SS_API ASSInventoryContainerBase : public AStaticMeshActor, public ISSInteractable
 {
 	GENERATED_UCLASS_BODY()
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	TSubobjectPtr<class UStaticMeshComponent> Mesh;
 
 private:
 	// Container Indentifier
@@ -114,6 +111,8 @@ protected:
 	UFUNCTION()
 		int32 GetItemIndex(FString ItemName);
 		
+
+public:
 	UFUNCTION()
 		bool AddItem(ASSItem* NewItem);
 

@@ -133,6 +133,8 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
 		ASSInventoryContainerBase* PlayerPack;
 
+	bool AddItemToInventory(ASSItem* ItemToAdd);
+
 protected:
 
 

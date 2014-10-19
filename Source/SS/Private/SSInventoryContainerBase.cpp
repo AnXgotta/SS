@@ -8,14 +8,14 @@
 ASSInventoryContainerBase::ASSInventoryContainerBase(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	Mesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Mesh"));
-	Mesh->AttachTo(RootComponent);
-	Mesh->AttachParent = RootComponent;
+
+	StaticMeshComponent->BodyInstance.SetCollisionProfileName("Interactable_Item");
+	StaticMeshComponent->SetSimulatePhysics(true);
+	StaticMeshComponent->SetEnableGravity(true);
 
 	CurrentWeight = 0.0f;
 	WeightCapacity = -1.0f;
 	InventoryContainerType = EInventoryContainerEnum::IC_NULL;
-
 }
 
 
