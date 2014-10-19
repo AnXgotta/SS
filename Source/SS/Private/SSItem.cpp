@@ -11,6 +11,7 @@ ASSItem::ASSItem(const class FPostConstructInitializeProperties& PCIP)
 	StaticMeshComponent->BodyInstance.SetCollisionProfileName("Interactable_Item");
 	StaticMeshComponent->SetSimulatePhysics(true);
 	StaticMeshComponent->SetEnableGravity(true);
+	StaticMeshComponent->SetMobility(EComponentMobility::Movable);
 
 	bReplicates = true;
 	bReplicateMovement = true;

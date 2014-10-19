@@ -86,7 +86,7 @@ class ASSCharacter : public ACharacter, public ISSInteractable
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		TSubobjectPtr<class UCameraComponent> CameraComponent;
+	TSubobjectPtr<class UCameraComponent> CameraComponent;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -108,6 +108,9 @@ private:
 	UFUNCTION()
 	void InitializePlayer();
 
+	UFUNCTION()
+		void InitializeInventory();
+
 		
 	///////////////////////////////////////////////////////
 	//  Player Vitals
@@ -122,18 +125,29 @@ protected:
 	//////////////////////////////////////////////////////
 	//  Player Inventory
 
+
 private:
 
-	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
+	const FName SOCKET_CLOTHES = FName(TEXT("SOCKET_CLOTHES"));
+
+	UPROPERTY(EditAnywhere, Category=Inventory)
+		TSubclassOf<class ASSInventoryContainerBase> PlayerClothesBlueprint;
+
+	UPROPERTY(EditAnywhere, Category = Inventory, Replicated)
 		ASSInventoryContainerBase* PlayerClothes;
 
-	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
+	UPROPERTY(EditDefaultsOnly, Category = Inventory, Replicated)
 		ASSInventoryContainerBase* PlayerBelt;
 
-	UPROPERTY(VisibleDefaultsOnly, Category=Inventory, Replicated)
+	UPROPERTY(EditDefaultsOnly, Category = Inventory, Replicated)
 		ASSInventoryContainerBase* PlayerPack;
 
+
 	bool AddItemToInventory(ASSItem* ItemToAdd);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void ServerAddItemToInventory(ASSItem* ItemToAdd);
+
 
 protected:
 
@@ -204,11 +218,17 @@ private:
 	// Player Interaction
 protected:
 
+	UFUNCTION()
 	void TraceForObjectRecognition();
 
+	UFUNCTION()
 	void TraceForObjectInteraction();
 
+	UFUNCTION()
 	void Interact();
+
+	UFUNCTION()
+		void HandleInteraction();
 
 	// [Server] Check with server to see if we can interact with object
 	UFUNCTION(Server, Reliable, WithValidation)

@@ -67,10 +67,10 @@ class SS_API ASSInventoryContainerBase : public AStaticMeshActor, public ISSInte
 
 private:
 	// Container Indentifier
-	UPROPERTY(EditAnywhere, Category = Enum)
+	UPROPERTY(EditAnywhere, Category = Inventory_Settings)
 		TEnumAsByte<EInventoryContainerEnum::Type> InventoryContainerType;
 	
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = Inventory_Settings)
 		float WeightCapacity;
 
 	UPROPERTY()
@@ -119,8 +119,12 @@ public:
 	UFUNCTION()
 		ASSItem* RemoveItem(FString RemovedItemName);
 
-	////////////////////////////////////////////////////////////
-	// ISSInventoryContainer Methods
+
+	UFUNCTION()
+		void OnAddedToPlayer();
+
+	UFUNCTION()
+		void OnRemovedFromPlayer();
 	
 
 	

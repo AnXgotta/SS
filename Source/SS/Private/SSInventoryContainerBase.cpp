@@ -12,6 +12,7 @@ ASSInventoryContainerBase::ASSInventoryContainerBase(const class FPostConstructI
 	StaticMeshComponent->BodyInstance.SetCollisionProfileName("Interactable_Item");
 	StaticMeshComponent->SetSimulatePhysics(true);
 	StaticMeshComponent->SetEnableGravity(true);
+	StaticMeshComponent->SetMobility(EComponentMobility::Movable);
 
 	CurrentWeight = 0.0f;
 	WeightCapacity = -1.0f;
@@ -72,7 +73,6 @@ bool ASSInventoryContainerBase::ContainsItem(FString ItemName){
 }
 
 int32 ASSInventoryContainerBase::GetItemIndex(FString ItemName){
-	if (ItemName == NULL) return false;
 	int32 index = 0;
 	for (FContainerSlot slot : ItemMap){
 		if (ItemName.Equals(slot.ItemName)){
@@ -84,19 +84,24 @@ int32 ASSInventoryContainerBase::GetItemIndex(FString ItemName){
 }
 
 bool ASSInventoryContainerBase::AddItem(ASSItem* NewItem){
+	USSConstants::ScreenMessage("Add Item", 5.0f, FColor::Cyan);
 	// new item null
 	if (NewItem == NULL) return false;
+	USSConstants::ScreenMessage("Check Weight", 5.0f, FColor::Cyan);
 	// container full
 	if (WeightCapacity < (CurrentWeight + NewItem->GetItemProperties().ItemWeight)) return false;
+	USSConstants::ScreenMessage("Check for stacking", 5.0f, FColor::Cyan);
 	// an item of this type already exists in the container (stacking)
 	FString ItemName = NewItem->GetItemProperties().ItemName;
 	int32 ItemIndex = GetItemIndex(ItemName);
 	if (ItemIndex > 0){
+		USSConstants::ScreenMessage("Stack", 5.0f, FColor::Cyan);
 		ItemMap[ItemIndex].AddItem(NewItem);
 	}else{
+		USSConstants::ScreenMessage("New Item", 5.0f, FColor::Cyan);
 		AddItemNewContainerSlot(NewItem);
 	}
-		
+	USSConstants::ScreenMessage("Adjust weight, other things, return true", 5.0f, FColor::Cyan);
 	// item added, do the things
 	AdjustWeightAdd(NewItem);
 	NewItem->OnAddedToContainer();
@@ -124,4 +129,20 @@ ASSItem* ASSInventoryContainerBase::RemoveItem(FString RemoveItemName){
 	AdjustWeightRemove(RemovedItem);
 	RemovedItem->OnRemovedFromContainer();
 	return RemovedItem;
+}
+
+
+///////////////////////////////////////////////////
+// Funcitonality
+
+void ASSInventoryContainerBase::OnAddedToPlayer(){
+	if (StaticMeshComponent){
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ASSInventoryContainerBase::OnRemovedFromPlayer(){
+	if (StaticMeshComponent){
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 }

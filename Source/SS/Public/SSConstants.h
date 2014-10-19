@@ -42,6 +42,29 @@ class SS_API USSConstants : public UObject
 		return (HitOut.GetActor() != NULL);
 	}
 
+	template <typename ObjectType>
+	static FORCEINLINE ObjectType* SpawnBlueprintActor(
+		UWorld* TheWorld,
+		UClass* TheBP,
+		const FVector& Loc,
+		const FRotator& Rot,
+		const bool bNoCollisionFail = true,
+		AActor* Owner = NULL,
+		APawn* Instigator = NULL
+		){
+		if (!TheWorld) return NULL;
+		if (!TheBP) return NULL;
+
+
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.bNoCollisionFail = bNoCollisionFail;
+		SpawnInfo.Owner = Owner;
+		SpawnInfo.Instigator = Instigator;
+		SpawnInfo.bDeferConstruction = false;
+
+		return TheWorld->SpawnActor<ObjectType>(TheBP, Loc, Rot, SpawnInfo);
+	}
+
 
 	static FORCEINLINE void ScreenMessage(const FString Message, float Time, FColor Color){
 		GEngine->AddOnScreenDebugMessage(-1, Time, Color, Message);

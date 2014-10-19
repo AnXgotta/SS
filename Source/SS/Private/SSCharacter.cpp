@@ -46,14 +46,6 @@ ASSCharacter::ASSCharacter(const class FPostConstructInitializeProperties& PCIP)
 	bReplicates = true;
 
 
-
-
-	
-	
-
-
-	
-
 }
 
 
@@ -73,6 +65,7 @@ void ASSCharacter::Tick(float DeltaSeconds){
 void ASSCharacter::PostInitializeComponents(){
 	Super::PostInitializeComponents();
 	InitializePlayer();
+	InitializeInventory();
 }
 
 void ASSCharacter::InitializePlayer(){
@@ -128,13 +121,32 @@ void ASSCharacter::InitializePlayer(){
 
 }
 
+void ASSCharacter::InitializeInventory(){
+	if (Role != ROLE_Authority) return;
+	if (PlayerClothesBlueprint){
+		PlayerClothes = USSConstants::SpawnBlueprintActor<ASSInventoryContainerBase>(GetWorld(), PlayerClothesBlueprint, GetActorLocation(), GetActorRotation());
+		if (PlayerClothes){
+			PlayerClothes->OnAddedToPlayer();
+			PlayerClothes->StaticMeshComponent->AttachTo(Mesh, SOCKET_CLOTHES);			
+		}
+	}
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 //  Player Inventory
 
 bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
+	
+	if (Role != ROLE_Authority){
+		USSConstants::ScreenMessage("Add Item Client", 5.0f, FColor::Cyan);
+		ServerAddItemToInventory(ItemToAdd);
+		return true;
+	}
+	USSConstants::ScreenMessage("Add Item Server ", 5.0f, FColor::Cyan);
 	bool bItemWasAdded = false;
 	if (!bItemWasAdded && PlayerClothes){
+		USSConstants::ScreenMessage("Add Item To Clothes", 5.0f, FColor::Cyan);
 		bItemWasAdded = PlayerClothes->AddItem(ItemToAdd);
 	}
 	if (!bItemWasAdded && PlayerBelt){
@@ -144,6 +156,14 @@ bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
 		bItemWasAdded = PlayerPack->AddItem(ItemToAdd);
 	}
 	return bItemWasAdded;
+}
+
+bool ASSCharacter::ServerAddItemToInventory_Validate(ASSItem* ItemToAdd){
+	return true;
+}
+
+void ASSCharacter::ServerAddItemToInventory_Implementation(ASSItem* ItemToAdd){
+	AddItemToInventory(ItemToAdd);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -386,7 +406,8 @@ void ASSCharacter::TraceForObjectInteraction(){
 			ISSInteractable* InteractableActor = InterfaceCast<ISSInteractable>(HitData.GetActor());
 			if (InteractableActor){
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Green);
-				ServerInteractResponse(true);		
+				CurrentRecognizedInteractableObject = HitData.GetActor();
+				HandleInteraction();
 			}else{
 				USSConstants::ScreenMessage(HitData.GetActor()->GetName(), 5.0f, FColor::Red);
 				ServerInteractResponse(false);
@@ -422,26 +443,33 @@ void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
 	if (!CurrentRecognizedInteractableObject) return;
 	USSConstants::ScreenMessage("Do interact with actor", 5.0f, FColor::Green);
 	
-	bool bWasInteractionHandled = false;
+}
+
+void ASSCharacter::HandleInteraction(){
+	if (!CurrentRecognizedInteractableObject) return;
 
 	// check if object is an item
 	ASSItem* InteractedItem = Cast<ASSItem>(CurrentRecognizedInteractableObject);
 	if (InteractedItem){
 		USSConstants::ScreenMessage("Item Interaction", 5.0f, FColor::Green);
-		if (!bWasInteractionHandled && AddItemToInventory(InteractedItem)){
-			bWasInteractionHandled = true;
+		if (AddItemToInventory(InteractedItem)){
 			InterfaceCast<ISSInteractable>(InteractedItem)->OnInteract();
-		}		
+			ServerInteractResponse(true);
+			return;
+		}
 	}
-	
+
 	// check if object is an inventory container
 	ASSInventoryContainerBase* InteractedInventoryItem = Cast<ASSInventoryContainerBase>(CurrentRecognizedInteractableObject);
-	if (bWasInteractionHandled && InteractedInventoryItem){
+	if (InteractedInventoryItem){
 		USSConstants::ScreenMessage("Inventory Item Interaction", 5.0f, FColor::Green);
-		bWasInteractionHandled = true;
+		ServerInteractResponse(true);
+		return;
 	}
-}
 
+	ServerInteractResponse(false);
+
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Player Input Management
