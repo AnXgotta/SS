@@ -16,4 +16,12 @@ class SS_API ASSItem_CubeTrace : public ASSItem
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
 	TSubobjectPtr<class UBoxComponent> TraceComponent;
 	
+
+	///////////////////////////////////////////////////
+	// Funcitonality
+
+	void OnAddedToContainer();
+
+	void OnRemovedFromContainer();
+
 };

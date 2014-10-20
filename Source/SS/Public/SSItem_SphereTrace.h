@@ -17,4 +17,12 @@ class SS_API ASSItem_SphereTrace : public ASSItem
 	TSubobjectPtr<class USphereComponent> TraceComponent;
 	
 
+
+	///////////////////////////////////////////////////
+	// Funcitonality
+
+	void OnAddedToContainer();
+
+	void OnRemovedFromContainer();
+
 };

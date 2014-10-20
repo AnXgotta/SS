@@ -62,9 +62,9 @@ public:
 	///////////////////////////////////////////////////
 	// Funcitonality
 
-	void OnAddedToContainer();
+	virtual void OnAddedToContainer();
 
-	void OnRemovedFromContainer();
+	virtual void OnRemovedFromContainer();
 
 
 	///////////////////////////////////////////////////

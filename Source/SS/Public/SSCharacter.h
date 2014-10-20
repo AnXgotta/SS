@@ -101,6 +101,7 @@ class ASSCharacter : public ACharacter, public ISSInteractable
 	//  Player Initialization
 
 	virtual void PostInitializeComponents() override;
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
@@ -126,15 +127,18 @@ protected:
 	//  Player Inventory
 
 
-private:
+protected:
 
 	const FName SOCKET_CLOTHES = FName(TEXT("SOCKET_CLOTHES"));
 
 	UPROPERTY(EditAnywhere, Category=Inventory)
 		TSubclassOf<class ASSInventoryContainerBase> PlayerClothesBlueprint;
 
-	UPROPERTY(EditAnywhere, Category = Inventory, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, ReplicatedUsing = OnRep_PlayerClothes)
 		ASSInventoryContainerBase* PlayerClothes;
+
+	UFUNCTION()
+		void OnRep_PlayerClothes();
 
 	UPROPERTY(EditDefaultsOnly, Category = Inventory, Replicated)
 		ASSInventoryContainerBase* PlayerBelt;
@@ -142,14 +146,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory, Replicated)
 		ASSInventoryContainerBase* PlayerPack;
 
-
+	UFUNCTION()
 	bool AddItemToInventory(ASSItem* ItemToAdd);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-		void ServerAddItemToInventory(ASSItem* ItemToAdd);
+	UFUNCTION(Client, Reliable, WithValidation)
+		void ClientAddItemToInventoryResponse(ASSItem* ItemToAdd);
 
-
-protected:
 
 
 

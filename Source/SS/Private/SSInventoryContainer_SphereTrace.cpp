@@ -18,3 +18,23 @@ ASSInventoryContainer_SphereTrace::ASSInventoryContainer_SphereTrace(const class
 }
 
 
+///////////////////////////////////////////////////
+// Funcitonality
+
+void ASSInventoryContainer_SphereTrace::OnAddedToPlayer(){
+	Super::OnAddedToPlayer();
+	if (TraceComponent){
+		//TraceComponent->SetSimulatePhysics(false);
+		//TraceComponent->SetEnableGravity(false);
+		//TraceComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ASSInventoryContainer_SphereTrace::OnRemovedFromPlayer(){
+	Super::OnRemovedFromPlayer();
+	if (TraceComponent){
+		//TraceComponent->SetSimulatePhysics(true);
+		//TraceComponent->SetEnableGravity(true);
+		//TraceComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+}

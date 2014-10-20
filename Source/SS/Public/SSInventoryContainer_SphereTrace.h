@@ -15,5 +15,19 @@ class SS_API ASSInventoryContainer_SphereTrace : public ASSInventoryContainerBas
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Item)
 	TSubobjectPtr<class USphereComponent> TraceComponent;
+
+
+
+
+
+
+
+
+public:
 	
+	void OnAddedToPlayer() override;
+
+	void OnRemovedFromPlayer() override;
+
+
 };

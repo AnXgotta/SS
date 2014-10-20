@@ -16,4 +16,13 @@ class SS_API ASSInventoryContainer_CubeTrace : public ASSInventoryContainerBase
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
 	TSubobjectPtr<class UBoxComponent> TraceComponent;
 	
+
+
+
+public:
+
+	void OnAddedToPlayer() override;
+
+	void OnRemovedFromPlayer() override;
+
 };

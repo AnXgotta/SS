@@ -17,3 +17,24 @@ ASSInventoryContainer_CubeTrace::ASSInventoryContainer_CubeTrace(const class FPo
 }
 
 
+///////////////////////////////////////////////////
+// Funcitonality
+
+void ASSInventoryContainer_CubeTrace::OnAddedToPlayer(){
+	Super::OnAddedToPlayer();
+	if (TraceComponent){
+		//TraceComponent->SetSimulatePhysics(false);
+		//TraceComponent->SetEnableGravity(false);
+		//TraceComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ASSInventoryContainer_CubeTrace::OnRemovedFromPlayer(){
+	Super::OnRemovedFromPlayer();
+	if (TraceComponent){
+		//TraceComponent->SetSimulatePhysics(true);
+		//TraceComponent->SetEnableGravity(true);
+		//TraceComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+}
+

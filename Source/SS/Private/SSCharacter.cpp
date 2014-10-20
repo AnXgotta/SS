@@ -65,6 +65,11 @@ void ASSCharacter::Tick(float DeltaSeconds){
 void ASSCharacter::PostInitializeComponents(){
 	Super::PostInitializeComponents();
 	InitializePlayer();
+	
+}
+
+void ASSCharacter::BeginPlay(){
+	Super::BeginPlay();
 	InitializeInventory();
 }
 
@@ -126,8 +131,10 @@ void ASSCharacter::InitializeInventory(){
 	if (PlayerClothesBlueprint){
 		PlayerClothes = USSConstants::SpawnBlueprintActor<ASSInventoryContainerBase>(GetWorld(), PlayerClothesBlueprint, GetActorLocation(), GetActorRotation());
 		if (PlayerClothes){
+			USSConstants::ScreenMessage("Added Player Clothes", 5.0f, FColor::Green);
+			PlayerClothes->SetOwner(this);
 			PlayerClothes->OnAddedToPlayer();
-			PlayerClothes->StaticMeshComponent->AttachTo(Mesh, SOCKET_CLOTHES);			
+			PlayerClothes->AttachRootComponentToActor(this, SOCKET_CLOTHES , EAttachLocation::SnapToTarget);
 		}
 	}
 
@@ -136,13 +143,17 @@ void ASSCharacter::InitializeInventory(){
 ////////////////////////////////////////////////////////////////////////
 //  Player Inventory
 
+void ASSCharacter::OnRep_PlayerClothes(){
+	USSConstants::ScreenMessage("OnRep PC", 5.0f, FColor::Green);
+	if (!PlayerClothes){
+		return;
+	}
+	PlayerClothes->OnAddedToPlayer();
+	PlayerClothes->AttachRootComponentToActor(this, SOCKET_CLOTHES , EAttachLocation::SnapToTarget);
+}
+
 bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
 	
-	if (Role != ROLE_Authority){
-		USSConstants::ScreenMessage("Add Item Client", 5.0f, FColor::Cyan);
-		ServerAddItemToInventory(ItemToAdd);
-		return true;
-	}
 	USSConstants::ScreenMessage("Add Item Server ", 5.0f, FColor::Cyan);
 	bool bItemWasAdded = false;
 	if (!bItemWasAdded && PlayerClothes){
@@ -155,15 +166,19 @@ bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
 	if (!bItemWasAdded && PlayerPack){
 		bItemWasAdded = PlayerPack->AddItem(ItemToAdd);
 	}
+
+	if (bItemWasAdded){
+		ClientAddItemToInventoryResponse(ItemToAdd);
+	}
 	return bItemWasAdded;
 }
 
-bool ASSCharacter::ServerAddItemToInventory_Validate(ASSItem* ItemToAdd){
+bool ASSCharacter::ClientAddItemToInventoryResponse_Validate(ASSItem* ItemToAdd){
 	return true;
 }
 
-void ASSCharacter::ServerAddItemToInventory_Implementation(ASSItem* ItemToAdd){
-	AddItemToInventory(ItemToAdd);
+void ASSCharacter::ClientAddItemToInventoryResponse_Implementation(ASSItem* ItemToAdd){
+	ItemToAdd->OnAddedToContainer();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -381,7 +396,7 @@ void ASSCharacter::TraceForObjectRecognition(){
 
 void ASSCharacter::TraceForObjectInteraction(){
 	// if local player
-	if (Role == ROLE_AutonomousProxy){
+	if (Role != ROLE_Authority){
 		// if currently looking at interactable object
 		if (CurrentRecognizedInteractableObject){
 			// tell the server

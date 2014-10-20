@@ -17,3 +17,22 @@ ASSItem_CubeTrace::ASSItem_CubeTrace(const class FPostConstructInitializePropert
 }
 
 
+
+///////////////////////////////////////////////////
+// Funcitonality
+
+void ASSItem_CubeTrace::OnAddedToContainer(){
+	Super::OnAddedToContainer();
+	SetActorHiddenInGame(true);
+	TraceComponent->SetSimulatePhysics(false);
+	TraceComponent->SetEnableGravity(false);
+	TraceComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ASSItem_CubeTrace::OnRemovedFromContainer(){
+	Super::OnRemovedFromContainer();
+	SetActorHiddenInGame(false);
+	TraceComponent->SetSimulatePhysics(true);
+	TraceComponent->SetEnableGravity(true);
+	TraceComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}

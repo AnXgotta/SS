@@ -33,11 +33,18 @@ FPropertiesStruct ASSItem::GetItemProperties(){
 // Funcitonality
 
 void ASSItem::OnAddedToContainer(){
+	USSConstants::ScreenMessage("Item On Added To Container", 5.0f, FColor::Cyan);
 	SetActorHiddenInGame(true);
+	StaticMeshComponent->SetSimulatePhysics(false);
+	StaticMeshComponent->SetEnableGravity(false);
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ASSItem::OnRemovedFromContainer(){
 	SetActorHiddenInGame(false);
+	StaticMeshComponent->SetSimulatePhysics(true);
+	StaticMeshComponent->SetEnableGravity(true);
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 

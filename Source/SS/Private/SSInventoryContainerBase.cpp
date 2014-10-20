@@ -17,6 +17,9 @@ ASSInventoryContainerBase::ASSInventoryContainerBase(const class FPostConstructI
 	CurrentWeight = 0.0f;
 	WeightCapacity = -1.0f;
 	InventoryContainerType = EInventoryContainerEnum::IC_NULL;
+
+	bReplicates = true;
+	bReplicateMovement = true;
 }
 
 
@@ -58,6 +61,7 @@ void ASSInventoryContainerBase::AddItemNewContainerSlot(ASSItem* NewItem){
 	NewSlot.ItemName = NewItem->GetItemProperties().ItemName;
 	NewSlot.ItemDescription = NewItem->GetItemProperties().ItemDescription;
 	NewSlot.ItemUIImage = NewItem->GetItemProperties().ItemUIImage;
+	NewSlot.Items.Add(NewItem);
 	ItemMap.Add(NewSlot);
 }
 
@@ -94,7 +98,7 @@ bool ASSInventoryContainerBase::AddItem(ASSItem* NewItem){
 	// an item of this type already exists in the container (stacking)
 	FString ItemName = NewItem->GetItemProperties().ItemName;
 	int32 ItemIndex = GetItemIndex(ItemName);
-	if (ItemIndex > 0){
+	if (ItemIndex >= 0){
 		USSConstants::ScreenMessage("Stack", 5.0f, FColor::Cyan);
 		ItemMap[ItemIndex].AddItem(NewItem);
 	}else{
@@ -136,13 +140,29 @@ ASSItem* ASSInventoryContainerBase::RemoveItem(FString RemoveItemName){
 // Funcitonality
 
 void ASSInventoryContainerBase::OnAddedToPlayer(){
+	USSConstants::ScreenMessage("InventoryItem OnAddedToPlayer", 5.0f, FColor::Magenta);
 	if (StaticMeshComponent){
+		StaticMeshComponent->SetSimulatePhysics(false);
+		StaticMeshComponent->SetEnableGravity(false);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
 void ASSInventoryContainerBase::OnRemovedFromPlayer(){
 	if (StaticMeshComponent){
+		StaticMeshComponent->SetSimulatePhysics(true);
+		StaticMeshComponent->SetEnableGravity(true);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+}
+
+void ASSInventoryContainerBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ASSInventoryContainerBase, InventoryContainerType, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ASSInventoryContainerBase, WeightCapacity, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ASSInventoryContainerBase, CurrentWeight, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ASSInventoryContainerBase, ItemMap, COND_OwnerOnly);
+
+
 }

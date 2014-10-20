@@ -24,16 +24,16 @@ struct FContainerSlot {
 
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = Inventory_Settings)
 		FString ItemName;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = Inventory_Settings)
 		FString ItemDescription;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = Inventory_Settings)
 		UTexture2D* ItemUIImage;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = Inventory_Settings)
 		TArray<ASSItem*> Items;
 
 	
@@ -65,21 +65,21 @@ class SS_API ASSInventoryContainerBase : public AStaticMeshActor, public ISSInte
 {
 	GENERATED_UCLASS_BODY()
 
-private:
+protected:
 	// Container Indentifier
-	UPROPERTY(EditAnywhere, Category = Inventory_Settings)
+	UPROPERTY(EditAnywhere, Category = Inventory_Settings, Replicated)
 		TEnumAsByte<EInventoryContainerEnum::Type> InventoryContainerType;
 	
-	UPROPERTY(EditDefaultsOnly, Category = Inventory_Settings)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inventory_Settings, Replicated)
 		float WeightCapacity;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inventory_Settings, Replicated)
 		float CurrentWeight;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inventory_Settings, Replicated)
 		TArray<FContainerSlot> ItemMap;
 
-protected:
+
 
 	UFUNCTION()
 		EInventoryContainerEnum::Type GetInventoryContainerType();
@@ -121,10 +121,10 @@ public:
 
 
 	UFUNCTION()
-		void OnAddedToPlayer();
+		virtual void OnAddedToPlayer();
 
 	UFUNCTION()
-		void OnRemovedFromPlayer();
+		virtual void OnRemovedFromPlayer();
 	
 
 	
