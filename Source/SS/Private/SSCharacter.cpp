@@ -128,13 +128,32 @@ void ASSCharacter::InitializePlayer(){
 
 void ASSCharacter::InitializeInventory(){
 	if (Role != ROLE_Authority) return;
+	if (!Mesh) return;
+
 	if (PlayerClothesBlueprint){
-		PlayerClothes = USSConstants::SpawnBlueprintActor<ASSInventoryContainerBase>(GetWorld(), PlayerClothesBlueprint, GetActorLocation(), GetActorRotation());
+		PlayerClothes = USSConstants::SpawnBlueprintActor<ASSInventoryContainerWearable>(GetWorld(), PlayerClothesBlueprint, GetActorLocation(), GetActorRotation());
 		if (PlayerClothes){
 			USSConstants::ScreenMessage("Added Player Clothes", 5.0f, FColor::Green);
 			PlayerClothes->SetOwner(this);
-			PlayerClothes->OnAddedToPlayer();
-			PlayerClothes->AttachRootComponentToActor(this, SOCKET_CLOTHES , EAttachLocation::SnapToTarget);
+			PlayerClothes->AttachRootComponentTo(Mesh, SOCKET_CLOTHES , EAttachLocation::SnapToTarget);
+		}
+	}
+
+	if (PlayerBeltBlueprint){
+		PlayerBelt = USSConstants::SpawnBlueprintActor<ASSInventoryContainerWearable>(GetWorld(), PlayerBeltBlueprint, GetActorLocation(), GetActorRotation());
+		if (PlayerBelt){
+			USSConstants::ScreenMessage("Added Player Clothes", 5.0f, FColor::Green);
+			PlayerBelt->SetOwner(this);
+			PlayerBelt->AttachRootComponentTo(Mesh, SOCKET_CLOTHES, EAttachLocation::SnapToTarget);
+		}
+	}
+
+	if (PlayerPackBlueprint){
+		PlayerPack = USSConstants::SpawnBlueprintActor<ASSInventoryContainerWearable>(GetWorld(), PlayerPackBlueprint, GetActorLocation(), GetActorRotation());
+		if (PlayerPack){
+			USSConstants::ScreenMessage("Added Player Clothes", 5.0f, FColor::Green);
+			PlayerPack->SetOwner(this);
+			PlayerPack->AttachRootComponentTo(Mesh, SOCKET_CLOTHES, EAttachLocation::SnapToTarget);
 		}
 	}
 
@@ -143,14 +162,6 @@ void ASSCharacter::InitializeInventory(){
 ////////////////////////////////////////////////////////////////////////
 //  Player Inventory
 
-void ASSCharacter::OnRep_PlayerClothes(){
-	USSConstants::ScreenMessage("OnRep PC", 5.0f, FColor::Green);
-	if (!PlayerClothes){
-		return;
-	}
-	PlayerClothes->OnAddedToPlayer();
-	PlayerClothes->AttachRootComponentToActor(this, SOCKET_CLOTHES , EAttachLocation::SnapToTarget);
-}
 
 bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
 	
@@ -161,6 +172,7 @@ bool ASSCharacter::AddItemToInventory(ASSItem* ItemToAdd){
 		bItemWasAdded = PlayerClothes->AddItem(ItemToAdd);
 	}
 	if (!bItemWasAdded && PlayerBelt){
+		USSConstants::ScreenMessage("Add Item To Belt", 5.0f, FColor::Cyan);
 		bItemWasAdded = PlayerBelt->AddItem(ItemToAdd);
 	}
 	if (!bItemWasAdded && PlayerPack){
@@ -450,7 +462,7 @@ bool ASSCharacter::ServerInteractResponse_Validate(bool bInteract){
 void ASSCharacter::ServerInteractResponse_Implementation(bool bInteract){
 	// server responded to client not to interact
 	if (!bInteract){
-		USSConstants::ScreenMessage("Do not interact with actor (is NULL)", 5.0f, FColor::Red);
+		USSConstants::ScreenMessage("Do not interact with actor", 5.0f, FColor::Red);
 		return;
 	}
 	// server responded to client to interact
@@ -477,7 +489,27 @@ void ASSCharacter::HandleInteraction(){
 	// check if object is an inventory container
 	ASSInventoryContainerBase* InteractedInventoryItem = Cast<ASSInventoryContainerBase>(CurrentRecognizedInteractableObject);
 	if (InteractedInventoryItem){
-		USSConstants::ScreenMessage("Inventory Item Interaction", 5.0f, FColor::Green);
+		USSConstants::ScreenMessage("Inventory Container Interaction", 5.0f, FColor::Green);
+
+		switch (InteractedInventoryItem->GetInventoryContainerType()){
+		case EInventoryContainerEnum::IC_VEST:
+			USSConstants::ScreenMessage("Inventory Container Spawn", 5.0f, FColor::Green);
+			PlayerBelt = USSConstants::SpawnBlueprintActor<ASSInventoryContainerWearable>(GetWorld(), InteractedInventoryItem->GetWearableBlueprint(), GetActorLocation(), GetActorRotation());
+			if (PlayerBelt){
+				USSConstants::ScreenMessage("Added Player Vest/Belt", 5.0f, FColor::Green);
+				PlayerBelt->SetOwner(this);
+				//PlayerBelt->OnAddedToPlayer();
+				PlayerBelt->AttachRootComponentTo(Mesh, SOCKET_VEST , EAttachLocation::SnapToTarget);
+				InteractedInventoryItem->Destroy();
+				InteractedInventoryItem = NULL;
+			}
+			break;
+		case EInventoryContainerEnum::IC_PACK:
+
+			break;
+
+
+		}
 		ServerInteractResponse(true);
 		return;
 	}
@@ -510,6 +542,22 @@ void ASSCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAxis("LookUp", this, &ASSCharacter::ManagePitch);
 }
 
+
+///////////////////////////////////////////////////////
+//  Interactable Interface
+
+void ISSInteractable::OnRecognized(){
+	USSConstants::ScreenMessage("OnRecognized - Player", 5.0f, FColor::Yellow);
+}
+
+void ISSInteractable::OnNotRecognized(){
+	USSConstants::ScreenMessage("OnNotRecognized - Player", 5.0f, FColor::Yellow);
+}
+
+
+void ISSInteractable::OnInteract(){
+	USSConstants::ScreenMessage("OnInteract - Player", 5.0f, FColor::Yellow);
+}
 
 /////////////////////////////////////////////////////////////////////////
 //  Player Replicated Props

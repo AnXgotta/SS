@@ -1,6 +1,7 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
 
+#include "SSInventoryContainerWearable.h"
 #include "SSInventoryContainerBase.h"
 #include "SSItem.h"
 #include "SSConstants.h"
@@ -129,26 +130,39 @@ protected:
 
 protected:
 
+	// socket name to attach inventory containers to player
 	const FName SOCKET_CLOTHES = FName(TEXT("SOCKET_CLOTHES"));
+	const FName SOCKET_VEST = FName(TEXT("SOCKET_VEST"));
 
+	// Blueprint to assing in Character defaults for clothes inventory item (for player spawn with clothes)
 	UPROPERTY(EditAnywhere, Category=Inventory)
-		TSubclassOf<class ASSInventoryContainerBase> PlayerClothesBlueprint;
+		TSubclassOf<class ASSInventoryContainerWearable> PlayerClothesBlueprint;
+	
+	// pointer to clothes inventory item
+	UPROPERTY(BlueprintReadOnly, Category = Inventory, Replicated)
+		ASSInventoryContainerWearable* PlayerClothes;
+	
+	// Blueprint to assing in Character defaults for belt inventory item (for player spawn with belt)
+	UPROPERTY(EditAnywhere, Category = Inventory)
+		TSubclassOf<class ASSInventoryContainerWearable> PlayerBeltBlueprint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, ReplicatedUsing = OnRep_PlayerClothes)
-		ASSInventoryContainerBase* PlayerClothes;
+	// pointer to belt inventory item
+	UPROPERTY(BlueprintReadOnly, Category = Inventory, Replicated)
+		ASSInventoryContainerWearable* PlayerBelt;
+	
+	// Blueprint to assing in Character defaults for pack inventory item (for player spawn with pack)
+	UPROPERTY(EditAnywhere, Category = Inventory)
+		TSubclassOf<class ASSInventoryContainerWearable> PlayerPackBlueprint;
 
-	UFUNCTION()
-		void OnRep_PlayerClothes();
-
-	UPROPERTY(EditDefaultsOnly, Category = Inventory, Replicated)
-		ASSInventoryContainerBase* PlayerBelt;
-
-	UPROPERTY(EditDefaultsOnly, Category = Inventory, Replicated)
-		ASSInventoryContainerBase* PlayerPack;
-
+	// pointer to pack inventory item
+	UPROPERTY(BlueprintReadOnly, Category = Inventory, Replicated)
+		ASSInventoryContainerWearable* PlayerPack;
+	
+	// [Server] try to add item to inventory, sends response to client
 	UFUNCTION()
 	bool AddItemToInventory(ASSItem* ItemToAdd);
-
+	
+	// [Client]  response from server when item added to inventory
 	UFUNCTION(Client, Reliable, WithValidation)
 		void ClientAddItemToInventoryResponse(ASSItem* ItemToAdd);
 
@@ -219,29 +233,30 @@ private:
 	///////////////////////////////////////////////////////////
 	// Player Interaction
 protected:
-
+	// [Client only] trace from players head to recognize object with which to interact
 	UFUNCTION()
 	void TraceForObjectRecognition();
-
+	// [Server + Client] called on server from client when client wants to interact, server does the things
 	UFUNCTION()
 	void TraceForObjectInteraction();
-
+	// [Client only] method called on Interact button press
 	UFUNCTION()
 	void Interact();
-
+	// [Server] handles interaction with object
 	UFUNCTION()
 		void HandleInteraction();
 
-	// [Server] Check with server to see if we can interact with object
+	// [Server] Check with server to interact with object
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerInteract();
 
-	// [Client] Server to client to give go/no-go on interaction
+	// [Client] Server to client to result of interaction
 	UFUNCTION(Client, Reliable, WithValidation)
 	void ServerInteractResponse(bool bInteract);
 
 
 private:
+	// actor pointer used when interacting
 	UPROPERTY()
 		AActor* CurrentRecognizedInteractableObject;
 
@@ -256,7 +271,14 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	///////////////////////////////////////////////////////
+	//  Interactable Interface
 
+	virtual void OnRecognized();
+
+	virtual void OnNotRecognized();
+
+	virtual void OnInteract();
 	
 	///////////////////////////////////////////////////////
 	//  Accessor/Mutator

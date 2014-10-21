@@ -22,19 +22,21 @@ ASSInventoryContainer_CubeTrace::ASSInventoryContainer_CubeTrace(const class FPo
 
 void ASSInventoryContainer_CubeTrace::OnAddedToPlayer(){
 	Super::OnAddedToPlayer();
+	if (InventoryContainerType != EInventoryContainerEnum::IC_CLOTHES || InventoryContainerType != EInventoryContainerEnum::IC_VEST) return;
 	if (TraceComponent){
-		//TraceComponent->SetSimulatePhysics(false);
-		//TraceComponent->SetEnableGravity(false);
-		//TraceComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		TraceComponent->SetSimulatePhysics(false);
+		TraceComponent->SetEnableGravity(false);
+		TraceComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
 void ASSInventoryContainer_CubeTrace::OnRemovedFromPlayer(){
 	Super::OnRemovedFromPlayer();
+	if (InventoryContainerType != EInventoryContainerEnum::IC_CLOTHES || InventoryContainerType != EInventoryContainerEnum::IC_VEST) return;
 	if (TraceComponent){
-		//TraceComponent->SetSimulatePhysics(true);
-		//TraceComponent->SetEnableGravity(true);
-		//TraceComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		TraceComponent->SetSimulatePhysics(true);
+		TraceComponent->SetEnableGravity(true);
+		TraceComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 }
 

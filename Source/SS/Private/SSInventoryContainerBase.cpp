@@ -139,6 +139,18 @@ ASSItem* ASSInventoryContainerBase::RemoveItem(FString RemoveItemName){
 ///////////////////////////////////////////////////
 // Funcitonality
 
+void ASSInventoryContainerBase::CopyContainerContents(ASSInventoryContainerBase* OtherContainer){
+	this->InventoryContainerType = OtherContainer->InventoryContainerType;
+	this->WeightCapacity = OtherContainer->WeightCapacity;
+	this->CurrentWeight = OtherContainer->CurrentWeight;
+	this->ItemMap.Append(OtherContainer->ItemMap);
+	this->ContainerUIImage = OtherContainer->ContainerUIImage;
+}
+
+TSubclassOf<class ASSInventoryContainerWearable> ASSInventoryContainerBase::GetWearableBlueprint(){
+	return ContainerWearableBlueprint;
+}
+
 void ASSInventoryContainerBase::OnAddedToPlayer(){
 	USSConstants::ScreenMessage("InventoryItem OnAddedToPlayer", 5.0f, FColor::Magenta);
 	if (StaticMeshComponent){

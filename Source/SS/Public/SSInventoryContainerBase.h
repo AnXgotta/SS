@@ -77,12 +77,13 @@ protected:
 		float CurrentWeight;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inventory_Settings, Replicated)
+		UTexture2D* ContainerUIImage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inventory_Settings, Replicated)
+		TSubclassOf<class ASSInventoryContainerWearable> ContainerWearableBlueprint;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Inventory_Settings, Replicated)
 		TArray<FContainerSlot> ItemMap;
-
-
-
-	UFUNCTION()
-		EInventoryContainerEnum::Type GetInventoryContainerType();
 
 	UFUNCTION()
 		void SetInventoryContainerType(EInventoryContainerEnum::Type NewContainerType);
@@ -113,12 +114,21 @@ protected:
 		
 
 public:
+
+	UFUNCTION()
+		EInventoryContainerEnum::Type GetInventoryContainerType();
+
+	UFUNCTION()
+		TSubclassOf<class ASSInventoryContainerWearable> GetWearableBlueprint();
+
 	UFUNCTION()
 		bool AddItem(ASSItem* NewItem);
 
 	UFUNCTION()
 		ASSItem* RemoveItem(FString RemovedItemName);
 
+	UFUNCTION()
+		void CopyContainerContents(ASSInventoryContainerBase* OtherContainer);
 
 	UFUNCTION()
 		virtual void OnAddedToPlayer();

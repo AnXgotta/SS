@@ -16,7 +16,6 @@ class SS_API USSConstants : public UObject
 
 	GENERATED_UCLASS_BODY()
 
-
 	static FORCEINLINE bool TraceInteractable(AActor* ActorToIgnore, const FVector& Start, const FVector& End, FHitResult& HitOut, ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel2, bool ReturnPhysMat = false) {
 		FCollisionQueryParams TraceParams(FName(TEXT("Trace Interactable")), true, ActorToIgnore);
 		TraceParams.bTraceComplex = true;
@@ -69,6 +68,9 @@ class SS_API USSConstants : public UObject
 	static FORCEINLINE void ScreenMessage(const FString Message, float Time, FColor Color){
 		GEngine->AddOnScreenDebugMessage(-1, Time, Color, Message);
 	}
+
+
+
 
 
 };
